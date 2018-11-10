@@ -25,12 +25,13 @@ uint64_t Get_Timer_Count(void)
     return timer_count;
 }
 
+uint16_t Get_Timer_Count_Register(void)
+{
+    return TCNT1;
+}
+
 ISR(TIMER1_OVF_vect)
 {
     timer_count++;
-    if(0 == (timer_count % 100))
-    {
-        UDR0 = 'T';
-    }
     TCNT1 = 0xC180;
 }

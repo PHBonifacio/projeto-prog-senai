@@ -10,7 +10,7 @@
 #define TIMERS_H_
 
 void Timer_Init(void);
-
+uint16_t Get_Timer_Count_Register(void);
 uint64_t Get_Timer_Count(void);
 
 #endif /* TIMERS_H_ */

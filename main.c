@@ -21,14 +21,16 @@
 
 int main(void)
 {
+	Timer_Init();
     USART_Init();
     USART_rxIE();
+    
+	sei();
+
     ADC_Init();
     DisplayLCD_Init();
-	Timer_Init();
-	sei();
     
-    DisplayLCD_Out(1,0, (unsigned char *)"Solo Emcharcado");
+    DisplayLCD_Out(1,1, (unsigned char *)"TESTE lcd");
     DisplayLCD_Out(2,0, (unsigned char *)"BOM DIA");
     _delay_ms(1000);
     

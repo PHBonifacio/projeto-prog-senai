@@ -110,8 +110,9 @@ void USART_rxIE()
 void USART_SM(void)
 {
     static usart_sm_status_t status_sm_rx = READ;
-    static uint8_t internal_buffer[20];
+    static uint8_t internal_buffer[100];
     static uint8_t buffer_index = 0;
+    static uint8_t index_aux = 0;
     static uint8_t flag_escape = 0;
     uint8_t rd = 0;
     uint16_t crc_calc = 0;
@@ -180,17 +181,20 @@ void USART_SM(void)
                 {
                     buffer_index = 0;
                     status_sm_rx = READ;
+                    while(FINISHED != USART_StrTx((const char *)"CRC\n"));
                 }
             }
         break;
 
         case HANDLE:
-            for (uint8_t i = 0; i < buffer_index; i++)
-			{
-				USART_Transmit(internal_buffer[i]);
-			}
-            buffer_index = 0;
-			status_sm_rx = READ;
+            USART_Transmit(internal_buffer[index_aux++]);
+
+            if(buffer_index == index_aux)
+            {
+                index_aux = 0;
+                buffer_index = 0;
+                status_sm_rx = READ;
+            }
         break;
 
         default:

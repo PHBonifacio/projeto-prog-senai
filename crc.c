@@ -45,23 +45,6 @@ task_state_t Calc_CRC16_Byte(uint8_t byte)
         result = FINISHED;
         j = 0;
     }
-/* 
-    for (j = 0; j < 8; j++)
-    {
-        test = ((uint16_t)byte) << (j + 8);
-        test ^= crc;
-        test &= 0x8000;
-
-        if (test)
-        {
-            crc = (uint16_t)(crc << 1);
-            crc = (uint16_t)(crc ^ 0x1021);
-        }
-        else
-        {
-            crc = (uint16_t)(crc << 1);
-        }
-    } */
 
     return result;
 }
