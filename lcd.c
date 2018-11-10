@@ -2,13 +2,55 @@
 #include <util/delay.h>
 #include "timers.h"
 
-static void LCD_Enable(void) /* INSTRUCAO DE CLOCK PARA O LCD */
+static task_state_t LCD_Enable(void) /* INSTRUCAO DE CLOCK PARA O LCD */
 {
-    _delay_us(40);
-    LCD_EN_IO = 1;
-    _delay_us(40);
-    LCD_EN_IO = 0;
-    _delay_us(40);
+    task_state_t result = RUNNING;
+    static uint8_t state = 0;
+    static uint16_t timer = 0;
+
+    switch(state)
+    {
+        case 0:
+            if(0 == timer)
+            {
+                timer = Get_Timer_Count_Register();
+            }
+            else if((16 * 40) <= (Get_Timer_Count_Register() - timer))
+            {
+                LCD_EN_IO = 1;
+                timer = 0;
+                state = 1;
+            }
+        break;
+
+        case 1:
+            if(0 == timer)
+            {
+                timer = Get_Timer_Count_Register();
+            }
+            else if((16 * 40) <= (Get_Timer_Count_Register() - timer))
+            {
+                LCD_EN_IO = 0;
+                timer = 0;
+                state = 2;
+            }
+        break;
+
+        case 2:
+            if(0 == timer)
+            {
+                timer = Get_Timer_Count_Register();
+            }
+            else if((16 * 40) <= (Get_Timer_Count_Register() - timer))
+            {
+                timer = 0;
+                state = 0;
+                result = FINISHED;
+            }
+        break;
+    }
+    
+    return result;
 }
 
 //****************************Fun��es
@@ -34,7 +76,7 @@ static void LCD_Write_Data(unsigned char RS, unsigned char Data)
     LCD_DATA6_IO = ((Data & 0x40) == 0x40);
     LCD_DATA7_IO = ((Data & 0x80) == 0x80);
 
-    LCD_Enable();
+    while(FINISHED != LCD_Enable());
 
     Data = Data << 4; //Rotaciona o nibble o LSB para a posi��o MSB
     LCD_DATA4_IO = ((Data & 0x10) == 0x10);
@@ -42,7 +84,7 @@ static void LCD_Write_Data(unsigned char RS, unsigned char Data)
     LCD_DATA6_IO = ((Data & 0x40) == 0x40);
     LCD_DATA7_IO = ((Data & 0x80) == 0x80);
 
-    LCD_Enable();
+    while(FINISHED != LCD_Enable());
 }
 
 void DisplayLCD_Cmd(unsigned char CmdLCD)
@@ -76,17 +118,17 @@ void DisplayLCD_Init()
 
     LCD_DATA4_IO = 1;
     LCD_DATA5_IO = 1;
-    LCD_Enable();
-    LCD_Enable();
-    LCD_Enable();
+    while(FINISHED != LCD_Enable());
+    while(FINISHED != LCD_Enable());
+    while(FINISHED != LCD_Enable());
 
     _delay_ms(1);
 
     LCD_DATA4_IO = 0;
     LCD_DATA5_IO = 1;
-    LCD_Enable();
-    LCD_Enable();
-    LCD_Enable();
+    while(FINISHED != LCD_Enable());
+    while(FINISHED != LCD_Enable());
+    while(FINISHED != LCD_Enable());
 
     _delay_ms(1);
 

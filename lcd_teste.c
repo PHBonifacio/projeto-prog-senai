@@ -49,11 +49,7 @@ static task_state_t LCD_Enable(void) /* INSTRUCAO DE CLOCK PARA O LCD */
             }
         break;
     }
-    /* _delay_us(40);
-    LCD_EN_IO = 1;
-    _delay_us(40);
-    LCD_EN_IO = 0;
-    _delay_us(40); */
+    
     return result;
 }
 
